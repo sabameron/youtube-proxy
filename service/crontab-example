@@ -1,0 +1,14 @@
+# YouTube Selective Proxy用のcrontab設定例
+# 以下のコマンドでインストール: crontab -u creater service/crontab-example
+
+# ホワイトリストの自動更新（毎時実行）
+0 * * * * /var/www/youtube-proxy/service/update-whitelist.sh > /dev/null 2>&1
+
+# データベースの自動バックアップ（毎日2:00AM実行）
+0 2 * * * /var/www/youtube-proxy/service/backup-db.sh > /dev/null 2>&1
+
+# サービス監視（5分ごとに実行）
+*/5 * * * * systemctl is-active --quiet youtube-proxy || systemctl restart youtube-proxy
+
+# ログローテーション（毎週日曜日の深夜に実行）
+0 3 * * 0 /usr/sbin/logrotate -f /etc/logrotate.d/youtube-proxy-logrotate
