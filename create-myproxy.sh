@@ -244,10 +244,11 @@ configure_apache() {
 
     log_info "Apache逆プロキシを設定しています..."
     
+    # スクリプトディレクトリの絶対パスを取得
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     
     # 設定ファイルをコピー
-    cp "$SCRIPT_DIR/config/youtube-proxy.conf" /etc/apache2/sites-available/ || {
+    cp "${SCRIPT_DIR}/config/youtube-proxy.conf" /etc/apache2/sites-available/ || {
         log_error "Apache設定ファイルのコピーに失敗しました。"
         exit 1
     }
