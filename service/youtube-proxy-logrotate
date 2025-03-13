@@ -1,0 +1,13 @@
+/var/log/youtube-proxy/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 creater adm
+    sharedscripts
+    postrotate
+        systemctl reload youtube-proxy.service > /dev/null 2>&1 || true
+    endscript
+}
