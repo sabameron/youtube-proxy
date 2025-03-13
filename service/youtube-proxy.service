@@ -1,0 +1,25 @@
+[Unit]
+Description=YouTube Selective Proxy Web Application
+Documentation=https://github.com/yourname/youtube-selective-proxy
+After=network.target
+
+[Service]
+Type=simple
+User=creater
+WorkingDirectory=/var/www/youtube-proxy
+ExecStart=/usr/bin/node app.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=youtube-proxy
+Environment=NODE_ENV=production PORT=3000
+
+# セキュリティ設定
+PrivateTmp=true
+ProtectSystem=full
+NoNewPrivileges=true
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
