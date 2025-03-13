@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Proxy - ログイン</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      padding-top: 5rem;
+    }
+    .login-container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .login-header h1 {
+      color: #d92323;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="login-container">
+      <div class="login-header">
+        <h1>YouTube Proxy</h1>
+        <p class="text-muted">管理者ログイン</p>
+      </div>
+      
+      <% if (error) { %>
+        <div class="alert alert-danger">
+          <%= error %>
+        </div>
+      <% } %>
+      
+      <form action="/login" method="POST">
+        <div class="mb-3">
+          <label for="username" class="form-label">ユーザー名</label>
+          <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">パスワード</label>
+          <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">ログイン</button>
+        </div>
+      </form>
+      
+      <div class="mt-4 text-center">
+        <a href="/request">動画申請ページへ</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
