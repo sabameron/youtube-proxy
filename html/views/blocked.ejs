@@ -53,4 +53,48 @@
       </div>
       
       <div class="alert alert-danger">
-        <p>このYouTubeコンテンツへのアクセスは現在ブロックされ
+        <p>このYouTubeコンテンツへのアクセスは現在ブロックされています。このコンテンツを閲覧するには、以下の「アクセス申請」ボタンをクリックしてください。</p>
+      </div>
+      
+      <% if (youtubeUrl) { %>
+        <h5>ブロックされたURL:</h5>
+        <div class="url-display">
+          <%= youtubeUrl %>
+        </div>
+        
+        <% 
+        let videoId = '';
+        try {
+          const urlObj = new URL(youtubeUrl);
+          if (urlObj.hostname.includes('youtube.com')) {
+            videoId = urlObj.searchParams.get('v') || '';
+          } else if (urlObj.hostname.includes('youtu.be')) {
+            videoId = urlObj.pathname.substring(1);
+          }
+        } catch (e) {
+          // URLパース失敗
+        }
+        %>
+        
+        <% if (videoId) { %>
+          <div class="d-grid gap-2">
+            <a href="/request?url=<%= encodeURIComponent(youtubeUrl) %>" class="btn btn-primary">
+              <i class="fas fa-unlock-alt"></i> アクセス申請
+            </a>
+          </div>
+        <% } else { %>
+          <div class="alert alert-warning">
+            <p>有効なYouTube動画URLではないようです。動画IDを特定できません。</p>
+          </div>
+        <% } %>
+      <% } else { %>
+        <div class="alert alert-info">
+          <p>URLが指定されていません。</p>
+        </div>
+      <% } %>
+      
+      <div class="mt-4 text-center">
+        <p>
+          <small class="text-muted">デジタルウェルビーイングのためのYouTubeアクセス管理</small>
+        </p>
+      </div>
