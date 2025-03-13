@@ -1,0 +1,78 @@
+/* YouTube Proxy スタイルシート */
+
+:root {
+  --primary-color: #d92323;
+  --secondary-color: #333;
+  --light-bg: #f8f9fa;
+  --dark-bg: #343a40;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --info-color: #17a2b8;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* ヘッダー・ナビゲーション */
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* カード・コンテナ */
+.custom-container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+/* フォーム要素 */
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(217, 35, 35, 0.25);
+}
+
+/* ボタン */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background-color: #c01e1e;
+  border-color: #b41a1a;
+}
+
+/* アニメーション */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* レスポンシブ調整 */
+@media (max-width: 768px) {
+  body {
+    padding-top: 4rem;
+  }
+  
+  .request-container, .blocked-container, .login-container {
+    padding: 1.5rem;
+  }
+}
