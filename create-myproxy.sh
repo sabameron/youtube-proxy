@@ -22,7 +22,7 @@ NC='\033[0m' # No Color
 show_logo() {
     echo -e "${BLUE}"
     echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-    echo "┃  YouTube Selective Proxy - Safe Access Installation   ┃"
+    echo "┃  YouTube Selective Proxy - Safe Access Installation ┃"
     echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
     echo -e "${NC}"
 }
