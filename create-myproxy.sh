@@ -264,7 +264,7 @@ test_connectivity() {
     if ! systemctl is-active --quiet apache2; then
         log_error "Apacheが実行されていません。"
         exit 1
-    }
+    fi
     
     # ネットワーク接続をテスト
     SERVER_IP=$(hostname -I | awk '{print $1}')
