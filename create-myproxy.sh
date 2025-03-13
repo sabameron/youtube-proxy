@@ -8,6 +8,9 @@
 # エラー発生時に停止
 set -e
 
+# キャッシュファイルのパス
+CACHE_FILE="$(dirname "${BASH_SOURCE[0]}")/install-progress.cache"
+
 # カラー定義
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -50,8 +53,31 @@ confirm() {
     esac
 }
 
+# チェックポイント関数: 完了したステップを保存
+mark_step_completed() {
+    local step_name="$1"
+    echo "$step_name" >> "$CACHE_FILE"
+    log_info "ステップ '$step_name' を完了としてマーク"
+}
+
+# チェックポイント関数: ステップが完了しているか確認
+is_step_completed() {
+    local step_name="$1"
+    if [ -f "$CACHE_FILE" ]; then
+        grep -q "^$step_name$" "$CACHE_FILE"
+        return $?
+    else
+        return 1
+    fi
+}
+
 # 前提条件チェック
 check_prerequisites() {
+    if is_step_completed "prerequisites"; then
+        log_info "前提条件のチェックはすでに完了しています。スキップします。"
+        return 0
+    fi
+
     log_info "前提条件を確認しています..."
     
     # Ubuntuコンテナ確認
@@ -75,10 +101,16 @@ check_prerequisites() {
     fi
     
     log_info "前提条件を満たしています。"
+    mark_step_completed "prerequisites"
 }
 
 # 必要なパッケージのインストール
 install_packages() {
+    if is_step_completed "packages"; then
+        log_info "パッケージのインストールはすでに完了しています。スキップします。"
+        return 0
+    fi
+
     log_info "必要なパッケージをインストールしています..."
     
     # 必要なパッケージをアップデート
@@ -94,11 +126,19 @@ install_packages() {
     }
     
     log_info "パッケージのインストールが完了しました。"
+    mark_step_completed "packages"
 }
 
 # Squidプロキシの設定
 configure_squid() {
+    if is_step_completed "squid"; then
+        log_info "Squidプロキシの設定はすでに完了しています。スキップします。"
+        return 0
+    fi
+
     log_info "Squidプロキシを設定しています..."
+    
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     
     # バックアップ作成
     if [ -f /etc/squid/squid.conf ]; then
@@ -135,11 +175,19 @@ configure_squid() {
     }
     
     log_info "Squidプロキシの設定が完了しました。"
+    mark_step_completed "squid"
 }
 
 # Webアプリケーションのセットアップ
 setup_webapp() {
+    if is_step_completed "webapp"; then
+        log_info "Webアプリケーションのセットアップはすでに完了しています。スキップします。"
+        return 0
+    fi
+
     log_info "Webアプリケーションをセットアップしています..."
+    
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     
     # Webアプリディレクトリ作成
     mkdir -p /var/www/youtube-proxy || {
@@ -184,11 +232,19 @@ setup_webapp() {
     }
     
     log_info "Webアプリケーションのセットアップが完了しました。"
+    mark_step_completed "webapp"
 }
 
 # Apache逆プロキシの設定
 configure_apache() {
+    if is_step_completed "apache"; then
+        log_info "Apache逆プロキシの設定はすでに完了しています。スキップします。"
+        return 0
+    fi
+
     log_info "Apache逆プロキシを設定しています..."
+    
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     
     # 設定ファイルをコピー
     cp "$SCRIPT_DIR/config/youtube-proxy.conf" /etc/apache2/sites-available/ || {
@@ -216,16 +272,23 @@ configure_apache() {
     }
     
     log_info "Apache逆プロキシの設定が完了しました。"
+    mark_step_completed "apache"
 }
 
 # ファイアウォールの設定
 setup_firewall() {
+    if is_step_completed "firewall"; then
+        log_info "ファイアウォールの設定はすでに完了しています。スキップします。"
+        return 0
+    fi
+
     log_info "ファイアウォールを設定しています..."
     
     # UFWがインストールされているか確認
     if ! command -v ufw &> /dev/null; then
         apt-get install -y ufw || {
             log_warn "UFWのインストールに失敗しました。ファイアウォール設定をスキップします。"
+            mark_step_completed "firewall"
             return
         }
     fi
@@ -242,10 +305,16 @@ setup_firewall() {
     }
     
     log_info "ファイアウォールの設定が完了しました。"
+    mark_step_completed "firewall"
 }
 
 # 接続テスト
 test_connectivity() {
+    if is_step_completed "connectivity"; then
+        log_info "接続テストはすでに完了しています。スキップします。"
+        return 0
+    fi
+
     log_info "接続テストを実行しています..."
     
     # Squidプロキシが実行中か確認
@@ -272,10 +341,16 @@ test_connectivity() {
     log_info "接続テストが完了しました。"
     log_info "プロキシサーバーが ${SERVER_IP}:3128 で実行されています。"
     log_info "管理インターフェースが http://${SERVER_IP}/youtube-proxy で利用可能です。"
+    mark_step_completed "connectivity"
 }
 
 # テストガイド表示
 show_test_guide() {
+    if is_step_completed "test_guide"; then
+        log_info "テストガイドはすでに表示しました。スキップします。"
+        return 0
+    fi
+
     SERVER_IP=$(hostname -I | awk '{print $1}')
     
     echo -e "\n${BLUE}=== テスト方法 ===${NC}"
@@ -300,6 +375,8 @@ show_test_guide() {
     if [ "$key" = "q" ]; then
         log_info "テストが完了しました。"
     fi
+    
+    mark_step_completed "test_guide"
 }
 
 # 完了メッセージ表示
@@ -329,22 +406,127 @@ show_completion() {
     echo -e "   - アプリログ: journalctl -u youtube-proxy"
     echo
     echo -e "${GREEN}セットアップが正常に完了しました！${NC}"
+    
+    # インストールキャッシュを完了としてマーク
+    mark_step_completed "installation_complete"
+}
+
+# キャッシュをリセットする関数
+reset_cache() {
+    if [ -f "$CACHE_FILE" ]; then
+        log_info "進行状況キャッシュをリセットしています..."
+        rm "$CACHE_FILE"
+        log_info "キャッシュをリセットしました。次回実行時にインストールを最初から開始します。"
+    else
+        log_info "キャッシュファイルが見つかりません。リセットは不要です。"
+    fi
+}
+
+# キャッシュ状態を表示する関数
+show_cache_status() {
+    echo -e "\n${BLUE}=== インストール進行状況 ===${NC}"
+    
+    if [ ! -f "$CACHE_FILE" ]; then
+        echo -e "インストールはまだ開始されていないか、キャッシュが存在しません。"
+        return
+    fi
+    
+    local total_steps=7
+    local completed_steps=$(wc -l < "$CACHE_FILE")
+    local completion_percentage=$((completed_steps * 100 / total_steps))
+    
+    echo -e "進行状況: ${YELLOW}${completion_percentage}%${NC} 完了 (${completed_steps}/${total_steps})"
+    echo -e "\n${YELLOW}完了したステップ:${NC}"
+    
+    if grep -q "prerequisites" "$CACHE_FILE"; then
+        echo -e "✅ 前提条件チェック"
+    else
+        echo -e "❌ 前提条件チェック"
+    fi
+    
+    if grep -q "packages" "$CACHE_FILE"; then
+        echo -e "✅ パッケージインストール"
+    else
+        echo -e "❌ パッケージインストール"
+    fi
+    
+    if grep -q "squid" "$CACHE_FILE"; then
+        echo -e "✅ Squidプロキシ設定"
+    else
+        echo -e "❌ Squidプロキシ設定"
+    fi
+    
+    if grep -q "webapp" "$CACHE_FILE"; then
+        echo -e "✅ Webアプリケーションセットアップ"
+    else
+        echo -e "❌ Webアプリケーションセットアップ"
+    fi
+    
+    if grep -q "apache" "$CACHE_FILE"; then
+        echo -e "✅ Apache逆プロキシ設定"
+    else
+        echo -e "❌ Apache逆プロキシ設定"
+    fi
+    
+    if grep -q "firewall" "$CACHE_FILE"; then
+        echo -e "✅ ファイアウォール設定"
+    else
+        echo -e "❌ ファイアウォール設定"
+    fi
+    
+    if grep -q "connectivity" "$CACHE_FILE"; then
+        echo -e "✅ 接続テスト"
+    else
+        echo -e "❌ 接続テスト"
+    fi
+    
+    echo
 }
 
 # メイン実行関数
 main() {
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    
     show_logo
     
-    # 前提条件確認
-    check_prerequisites
-    
-    # インストール前の確認
-    if ! confirm "YouTubeセレクティブプロキシのインストールを開始しますか？"; then
-        log_info "インストールがキャンセルされました。"
+    # コマンドライン引数の処理
+    if [ "$1" = "--reset" ]; then
+        reset_cache
         exit 0
     fi
     
+    if [ "$1" = "--status" ]; then
+        show_cache_status
+        exit 0
+    fi
+    
+    # インストール完了済みかチェック
+    if is_step_completed "installation_complete"; then
+        log_info "インストールはすでに完了しています。"
+        if confirm "再度セットアップを実行しますか？ キャッシュをリセットして最初から実行します。"; then
+            reset_cache
+        else
+            exit 0
+        fi
+    fi
+    
+    # 途中から再開する場合はステータス表示
+    if [ -f "$CACHE_FILE" ]; then
+        show_cache_status
+        if ! confirm "インストールを続行しますか？"; then
+            log_info "インストールがキャンセルされました。"
+            exit 0
+        fi
+    else
+        # 新規インストールの場合は確認
+        if ! confirm "YouTubeセレクティブプロキシのインストールを開始しますか？"; then
+            log_info "インストールがキャンセルされました。"
+            exit 0
+        fi
+    fi
+    
     # 手順実行
+    check_prerequisites
     install_packages
     configure_squid
     setup_webapp
@@ -360,4 +542,4 @@ main() {
 }
 
 # スクリプト実行
-main
+main "$@"
