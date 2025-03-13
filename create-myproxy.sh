@@ -5,6 +5,13 @@
 # 用途: 特定のYouTube動画IDのみ閲覧可能なプロキシの構築
 # 作成日: 2025-03-13
 
+# sudo権限チェック
+if [ "$(id -u)" -ne 0 ]; then
+    echo "このスクリプトはroot権限で実行する必要があります。"
+    echo "sudo $0 $* を実行してください。"
+    exit 1
+fi
+
 # エラー発生時に停止
 set -e
 
@@ -158,9 +165,17 @@ configure_squid() {
         exit 1
     }
     
-    # パーミッション設定
+    # パーミッション設定 - createrユーザーのグループを追加
     chown proxy:proxy /etc/squid/youtube_whitelist.txt
-    chmod 644 /etc/squid/youtube_whitelist.txt
+    chmod 664 /etc/squid/youtube_whitelist.txt
+    
+    # createrユーザーをsquidグループに追加してファイルアクセス権を付与
+    usermod -a -G proxy creater
+    
+    # squidのディレクトリにcreaterユーザーがアクセスできるようにする
+    chmod 775 /etc/squid
+    
+    log_info "createrユーザーにsquidのファイルアクセス権を付与しました。"
     
     # Squidを再起動
     systemctl restart squid || {
@@ -201,14 +216,25 @@ setup_webapp() {
         exit 1
     }
     
+    # createrユーザーに所有権を付与
+    chown -R creater:creater /var/www/youtube-proxy
+    
     # Node.jsの依存関係をインストール（cdコマンドを使わない方法）
     npm --prefix /var/www/youtube-proxy install /var/www/youtube-proxy || {
         log_error "Node.jsの依存関係のインストールに失敗しました。"
         exit 1
     }
     
-    # サービスファイルをコピー
-    cp "$SCRIPT_DIR/service/youtube-proxy.service" /etc/systemd/system/ || {
+    # サービスファイル修正のためにテンポラリファイルを作成
+    TEMP_SERVICE_FILE="/tmp/youtube-proxy.service"
+    cp "$SCRIPT_DIR/service/youtube-proxy.service" "$TEMP_SERVICE_FILE"
+    
+    # サービスファイルをcreaterユーザーで実行するように修正
+    sed -i 's/User=root/User=creater/g' "$TEMP_SERVICE_FILE"
+    sed -i 's/Group=root/Group=creater/g' "$TEMP_SERVICE_FILE"
+    
+    # 修正したサービスファイルをコピー
+    cp "$TEMP_SERVICE_FILE" /etc/systemd/system/youtube-proxy.service || {
         log_error "サービスファイルのコピーに失敗しました。"
         exit 1
     }
@@ -247,6 +273,9 @@ configure_apache() {
         log_error "Apache設定ファイルのコピーに失敗しました。"
         exit 1
     }
+    
+    # apache実行ユーザーをcreaterのグループに追加
+    usermod -a -G creater www-data
     
     # モジュールを有効化
     a2enmod proxy proxy_http headers rewrite ssl || {
