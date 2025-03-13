@@ -93,7 +93,7 @@ check_prerequisites() {
     fi
     
     # スクリプトディレクトリの確認
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
     if [ ! -d "$SCRIPT_DIR/html" ] || [ ! -d "$SCRIPT_DIR/config" ] || [ ! -d "$SCRIPT_DIR/service" ]; then
         log_error "必要なディレクトリ構造が見つかりません。"
         log_error "スクリプトと同じディレクトリに html, config, service ディレクトリが必要です。"
@@ -138,7 +138,7 @@ configure_squid() {
 
     log_info "Squidプロキシを設定しています..."
     
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
     
     # バックアップ作成
     if [ -f /etc/squid/squid.conf ]; then
@@ -187,7 +187,7 @@ setup_webapp() {
 
     log_info "Webアプリケーションをセットアップしています..."
     
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
     
     # Webアプリディレクトリ作成
     mkdir -p /var/www/youtube-proxy || {
@@ -201,13 +201,8 @@ setup_webapp() {
         exit 1
     }
     
-    # Nodeアプリケーションのインストール
-    cd /var/www/youtube-proxy || {
-        log_error "Webアプリディレクトリに移動できません。"
-        exit 1
-    }
-    
-    npm install || {
+    # Node.jsの依存関係をインストール（cdコマンドを使わない方法）
+    npm --prefix /var/www/youtube-proxy install /var/www/youtube-proxy || {
         log_error "Node.jsの依存関係のインストールに失敗しました。"
         exit 1
     }
@@ -245,7 +240,7 @@ configure_apache() {
     log_info "Apache逆プロキシを設定しています..."
     
     # スクリプトディレクトリの絶対パスを取得
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
     
     # 設定ファイルをコピー
     cp "${SCRIPT_DIR}/config/youtube-proxy.conf" /etc/apache2/sites-available/ || {
@@ -486,7 +481,7 @@ show_cache_status() {
 
 # メイン実行関数
 main() {
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
     
     show_logo
     
