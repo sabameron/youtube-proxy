@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Proxy - 動画アクセス申請</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      padding-top: 5rem;
+    }
+    .request-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    .request-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .request-header h1 {
+      color: #d92323;
+      font-weight: bold;
+    }
+    .info-box {
+      background-color: #f8f9fa;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="request-container">
+      <div class="request-header">
+        <h1>YouTube動画アクセス申請</h1>
+        <p class="text-muted">特定のYouTube動画へのアクセスを申請する</p>
+      </div>
+      
+      <% if (message) { %>
+        <div class="alert alert-<%= message.type === 'success' ? 'success' : 'danger' %>">
+          <%= message.text %>
+        </div>
+      <% } %>
+      
+      <div class="info-box">
+        <h5><i class="fas fa-info-circle"></i> 申請について</h5>
+        <p>
+          申請が承認されると、指定した動画に<strong>24時間</strong>アクセスできるようになります。
+          この期間が過ぎると自動的にアクセス権限が失効します。
+        </p>
+      </div>
+      
+      <form action="/request" method="POST">
+        <div class="mb-3">
+          <label for="youtube_url" class="form-label">YouTube URL</label>
+          <input type="url" class="form-control" id="youtube_url" name="youtube_url" 
+                 value="<%= youtubeUrl %>" placeholder="https://www.youtube.com/watch?v=..." required>
+          <div class="form-text">例: https://www.youtube.com/watch?v=dQw4w9WgXcQ</div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="video_id" class="form-label">動画ID</label>
+          <input type="text" class="form-control" id="video_id" name="video_id" 
+                 value="<%= videoId %>" placeholder="dQw4w9WgXcQ" required>
+          <div class="form-text">YouTubeのURLから自動的に抽出されます</div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="title" class="form-label">動画タイトル (オプション)</label>
+          <input type="text" class="form-control" id="title" name="title" 
+                 placeholder="参照のためのタイトル">
+        </div>
+        
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-paper-plane"></i> 申請する
+          </button>
+          <a href="javascript:history.back()" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 戻る
+          </a>
+        </div>
+      </form>
+      
+      <div class="mt-4 text-center">
+        <p>
+          <a href="/login">管理画面へ</a>
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlInput = document.getElementById('youtube_url');
+      const idInput = document.getElementById('video_id');
+      
+      // URLから動画IDを抽出
+      urlInput.addEventListener('input', function() {
+        const url = this.value;
+        try {
+          const urlObj = new URL(url);
+          let videoId = '';
+          
+          if (urlObj.hostname.includes('youtube.com')) {
+            videoId = urlObj.searchParams.get('v') || '';
+          } else if (urlObj.hostname.includes('youtu.be')) {
+            videoId = urlObj.pathname.substring(1);
+          }
+          
+          if (videoId) {
+            idInput.value = videoId;
+          }
+        } catch (e) {
+          // URLパース失敗 - 何もしない
+        }
+      });
+    });
+  </script>
+</body>
+</html>
