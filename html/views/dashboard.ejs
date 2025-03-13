@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Proxy - 管理ダッシュボード</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      padding-top: 5rem;
+    }
+    .navbar-brand {
+      font-weight: bold;
+      color: #d92323 !important;
+    }
+    .card {
+      border: none;
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+      margin-bottom: 1.5rem;
+    }
+    .card-header {
+      background-color: #f8f9fa;
+      border-bottom: none;
+      font-weight: 600;
+    }
+    .video-list {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    .video-item {
+      border-left: 4px solid #d92323;
+      margin-bottom: 0.5rem;
+    }
+    .expire-warning {
+      color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="/dashboard">YouTube Proxy</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="/dashboard">ダッシュボード</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/change-password">パスワード変更</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">ログアウト</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>YouTube動画ホワイトリスト</span>
+            <a href="/request" class="btn btn-sm btn-primary">
+              <i class="fas fa-plus"></i> 動画を追加
+            </a>
+          </div>
+          <div class="card-body">
+            <div class="video-list">
+              <% if (videos && videos.length > 0) { %>
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>動画ID</th>
+                        <th>タイトル</th>
+                        <th>申請日時</th>
+                        <th>期限</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% videos.forEach(function(video) { %>
+                        <tr class="video-item" data-id="<%= video.video_id %>">
+                          <td><%= video.video_id %></td>
+                          <td><%= video.title %></td>
+                          <td><%= new Date(video.created_at).toLocaleString() %></td>
+                          <td>
+                            <% if (video.expires_at) { %>
+                              <% const expires = new Date(video.expires_at); %>
+                              <% const now = new Date(); %>
+                              <% if (expires < now) { %>
+                                <span class="expire-warning">期限切れ</span>
+                              <% } else { %>
+                                <%= expires.toLocaleString() %>
+                                <% const hours = Math.floor((expires - now) / (1000 * 60 * 60)); %>
+                                <% if (hours < 24) { %>
+                                  <span class="expire-warning">(<%= hours %>時間後)</span>
+                                <% } %>
+                              <% } %>
+                            <% } else { %>
+                              無期限
+                            <% } %>
+                          </td>
+                          <td>
+                            <a href="https://www.youtube.com/watch?v=<%= video.video_id %>" target="_blank" class="btn btn-sm btn-info">
+                              <i class="fas fa-external-link-alt"></i>
+                            </a>
+                            <button class="btn btn-sm btn-danger delete-video" data-id="<%= video.video_id %>">
+                              <i class="fas fa-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      <% }); %>
+                    </tbody>
+                  </table>
+                </div>
+              <% } else { %>
+                <div class="alert alert-info">
+                  ホワイトリストに登録された動画はありません。
+                </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            使用方法
+          </div>
+          <div class="card-body">
+            <h5>1. ブラウザでプロキシを設定</h5>
+            <p>
+              各ブラウザのプロキシ設定で、このサーバーのIPアドレスとポート3128を指定してください。
+              認証が必要な場合は、指定されたユーザー名とパスワードを入力します。
+            </p>
+            
+            <h5>2. YouTube動画へのアクセス</h5>
+            <p>
+              ブラウザからYouTubeにアクセスすると、デフォルトではブロックされます。
+              特定の動画を見るには、ブロックページから申請するか、管理画面から直接追加します。
+            </p>
+            
+            <h5>3. 動画申請プロセス</h5>
+            <p>
+              ブロックページに表示される「動画を申請」ボタンをクリックすると、
+              その動画IDがホワイトリストに追加され、24時間アクセスできるようになります。
+              期限切れになると再度申請が必要です。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 動画削除処理
+      const deleteButtons = document.querySelectorAll('.delete-video');
+      deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const videoId = this.getAttribute('data-id');
+          if (confirm('この動画をホワイトリストから削除してもよろしいですか？')) {
+            fetch(`/delete/${videoId}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                const row = document.querySelector(`tr[data-id="${videoId}"]`);
+                if (row) {
+                  row.remove();
+                }
+              } else {
+                alert('削除中にエラーが発生しました: ' + (data.message || '不明なエラー'));
+              }
+            })
+            .catch(error => {
+              console.error('削除エラー:', error);
+              alert('削除中にエラーが発生しました');
+            });
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
