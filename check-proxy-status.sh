@@ -385,7 +385,7 @@ test_webapp_connection() {
 
 # ホワイトリストファイルの確認
 check_whitelist_file() {
-    local whitelist_file="/etc/squid/youtube_whitelist.txt"
+    local whitelist_file="/var/lib/youtube-proxy/youtube_whitelist.txt"
     
     if [ -f "$whitelist_file" ]; then
         local entry_count=$(wc -l < "$whitelist_file")

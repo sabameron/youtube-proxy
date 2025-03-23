@@ -173,7 +173,7 @@ main() {
     
     # 重要ファイルの確認
     check_file "/etc/squid/squid.conf" "Squid設定ファイル"
-    check_file "/etc/squid/youtube_whitelist.txt" "YouTubeホワイトリストファイル"
+    check_file "/var/lib/youtube-proxy/youtube_whitelist.txt" "YouTubeホワイトリストファイル"
     check_file "/var/www/youtube-proxy/database.sqlite" "アプリデータベース"
     
     # リソース使用状況

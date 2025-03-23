@@ -94,7 +94,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ホワイトリストの更新
 const updateSquidWhitelist = () => {
   return new Promise((resolve, reject) => {
-    const whitelistPath = '/etc/squid/youtube_whitelist.txt';
+    const whitelistPath = '/var/lib/youtube-proxy/youtube_whitelist.txt';
     
     db.all("SELECT video_id FROM whitelist WHERE expires_at > datetime('now') OR expires_at IS NULL", (err, rows) => {
       if (err) {

@@ -160,14 +160,14 @@ configure_squid() {
     }
     
     # アクセス制御ファイルをコピー
-    cp "$SCRIPT_DIR/config/youtube_whitelist.txt" /etc/squid/youtube_whitelist.txt || {
+    cp "$SCRIPT_DIR/config/youtube_whitelist.txt" /var/lib/youtube-proxy/youtube_whitelist.txt || {
         log_error "ホワイトリストファイルのコピーに失敗しました。"
         exit 1
     }
     
     # パーミッション設定 - createrユーザーのグループを追加
-    chown creater:creater /etc/squid/youtube_whitelist.txt
-    chmod 664 /etc/squid/youtube_whitelist.txt
+    chown proxy:proxy /var/lib/youtube-proxy/youtube_whitelist.txt
+    chmod 664 /var/lib/youtube-proxy/youtube_whitelist.txt
     
     # createrユーザーをsquidグループに追加してファイルアクセス権を付与
     usermod -a -G proxy creater

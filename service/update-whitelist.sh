@@ -31,7 +31,7 @@ log_error() {
 DB_FILE="/var/www/youtube-proxy/database.sqlite"
 
 # ホワイトリストファイルのパス
-WHITELIST_FILE="/etc/squid/youtube_whitelist.txt"
+WHITELIST_FILE="/var/lib/youtube-proxy/youtube_whitelist.txt"
 
 # 必要なパッケージの確認
 if ! command -v sqlite3 &> /dev/null; then
