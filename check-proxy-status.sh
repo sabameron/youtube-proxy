@@ -153,7 +153,7 @@ check_network_connections() {
     } >> "$LOG_FILE"
     
     # 主要ポートをチェック
-    local ports=("3128:Squidプロキシ" "80:HTTPサーバー" "443:HTTPSサーバー" "8080:YouTubeプロキシWebアプリ")
+    local ports=("3128:Squidプロキシ" "80:HTTPサーバー" "443:HTTPSサーバー" "3000:YouTubeプロキシWebアプリ")
     
     for port_info in "${ports[@]}"; do
         local port=$(echo "$port_info" | cut -d':' -f1)
