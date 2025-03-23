@@ -158,6 +158,9 @@ configure_squid() {
         log_error "Squid設定ファイルのコピーに失敗しました。"
         exit 1
     }
+
+    mkdir -p /var/lib/youtube-proxy
+    chown proxy:proxy /var/lib/youtube-proxy
     
     # アクセス制御ファイルをコピー
     cp "$SCRIPT_DIR/config/youtube_whitelist.txt" /var/lib/youtube-proxy/youtube_whitelist.txt || {
@@ -166,6 +169,7 @@ configure_squid() {
     }
     
     # パーミッション設定 - createrユーザーのグループを追加
+    
     chown proxy:proxy /var/lib/youtube-proxy/youtube_whitelist.txt
     chmod 664 /var/lib/youtube-proxy/youtube_whitelist.txt
     
