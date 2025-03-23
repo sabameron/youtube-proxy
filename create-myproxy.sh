@@ -370,7 +370,7 @@ test_connectivity() {
     
     log_info "接続テストが完了しました。"
     log_info "プロキシサーバーが ${SERVER_IP}:3128 で実行されています。"
-    log_info "管理インターフェースが http://${SERVER_IP}/youtube-proxy で利用可能です。"
+    log_info "管理インターフェースが http://${SERVER_IP}:3000/youtube-proxy で利用可能です。"
     mark_step_completed "connectivity"
 }
 
@@ -395,7 +395,7 @@ show_test_guide() {
     echo -e "3. 特定の動画URLをリクエストするには、ブロックページの申請ボタンを使用します。"
     echo
     echo -e "4. 管理画面は以下でアクセスできます:"
-    echo -e "   http://${SERVER_IP}/youtube-proxy"
+    echo -e "   http://${SERVER_IP}:3000/youtube-proxy"
     echo
     echo -e "5. テストが完了したら q キーを押してください。"
     
@@ -419,7 +419,7 @@ show_completion() {
     echo -e "${YELLOW}プロキシサーバー情報:${NC}"
     echo -e "- プロキシアドレス: ${SERVER_IP}"
     echo -e "- プロキシポート: 3128"
-    echo -e "- 管理インターフェース: http://${SERVER_IP}/youtube-proxy"
+    echo -e "- 管理インターフェース: http://${SERVER_IP}:3000/youtube-proxy"
     echo
     echo -e "${YELLOW}初期認証情報:${NC}"
     echo -e "- ユーザー名: admin"

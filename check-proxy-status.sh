@@ -325,7 +325,7 @@ check_squid_logs() {
 # Webアプリケーションへの接続テスト
 test_webapp_connection() {
     local server_ip=$(hostname -I | awk '{print $1}')
-    local webapp_url="http://${server_ip}/youtube-proxy"
+    local webapp_url="http://${server_ip}:3000/youtube-proxy"
     local temp_response="/tmp/webapp_response.tmp"
     
     # curlコマンドがインストールされているか確認

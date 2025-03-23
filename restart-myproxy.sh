@@ -157,7 +157,7 @@ main() {
     echo -e "${YELLOW}プロキシサーバー情報:${NC}"
     echo -e "- プロキシアドレス: ${SERVER_IP}"
     echo -e "- プロキシポート: 3128"
-    echo -e "- 管理インターフェース: http://${SERVER_IP}/youtube-proxy"
+    echo -e "- 管理インターフェース: http://${SERVER_IP}:3000/youtube-proxy"
     echo
     log_info "問題が発生した場合は、各サービスのログを確認してください。"
     echo -e "- Squidログ: /var/log/squid/access.log"
