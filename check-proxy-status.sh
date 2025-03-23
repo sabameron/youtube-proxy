@@ -25,7 +25,7 @@ LOG_FILE="${LOG_DIR}/status_check_${DATETIME}.log"
 show_logo() {
     echo -e "${BLUE}"
     echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-    echo "┃  YouTube Selective Proxy - Status Check              ┃"
+    echo "┃  YouTube Selective Proxy - Status Check             ┃"
     echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
     echo -e "${NC}"
 }
@@ -385,7 +385,7 @@ test_webapp_connection() {
 
 # ホワイトリストファイルの確認
 check_whitelist_file() {
-    local whitelist_file="/home/nishio/youtube-proxy/config/youtube_whitelist.txt"
+    local whitelist_file="/etc/squid/youtube_whitelist.txt"
     
     if [ -f "$whitelist_file" ]; then
         local entry_count=$(wc -l < "$whitelist_file")
@@ -545,7 +545,7 @@ main() {
     # root権限チェック
     if [ "$(id -u)" -ne 0 ]; then
         echo "このスクリプトはroot権限で実行する必要があります。"
-        echo "sudo $0 を実行してください。"
+        echo "sudo bash $0 を実行してください。"
         exit 1
     fi
     

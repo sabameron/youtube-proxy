@@ -1,6 +1,6 @@
 [Unit]
 Description=YouTube Selective Proxy Web Application
-Documentation=https://github.com/yourname/youtube-selective-proxy
+Documentation=https://github.com/sabameron/youtube-proxy
 After=network.target
 
 [Service]

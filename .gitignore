@@ -1,3 +1,4 @@
 logs/
 01_memo.txt
 *.cache
+*.log

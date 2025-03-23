@@ -1,0 +1,28 @@
+{
+    "server": {
+      "port": 3000,
+      "host": "0.0.0.0"
+    },
+    "proxy": {
+      "host": "127.0.0.1",
+      "port": 3128
+    },
+    "db": {
+      "path": "/home/nishio/youtube-proxy/data/database.sqlite"
+    },
+    "whitelist": {
+      "path": "/etc/squid/youtube_whitelist.txt"
+    },
+    "admin": {
+      "username": "admin",
+      "password": "admin123"
+    },
+    "log": {
+      "level": "info",
+      "path": "/var/log/youtube-proxy/app.log"
+    },
+    "session": {
+      "secret": "ランダムな文字列をここに入力",
+      "maxAge": 86400000
+    }
+  }

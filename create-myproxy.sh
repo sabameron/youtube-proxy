@@ -8,7 +8,7 @@
 # sudo権限チェック
 if [ "$(id -u)" -ne 0 ]; then
     echo "このスクリプトはroot権限で実行する必要があります。"
-    echo "sudo $0 $* を実行してください。"
+    echo "sudo bash $0 $* を実行してください。"
     exit 1
 fi
 
@@ -127,7 +127,7 @@ install_packages() {
     }
     
     # 必要なパッケージをインストール
-    apt-get install -y squid apache2 nodejs npm sqlite3 certbot python3-certbot-apache curl wget build-essential || {
+    apt-get install -y squid apache2 nodejs npm sqlite3 certbot python3-certbot-apache curl wget build-essential net-tools || {
         log_error "パッケージのインストールに失敗しました。"
         exit 1
     }
@@ -166,7 +166,7 @@ configure_squid() {
     }
     
     # パーミッション設定 - createrユーザーのグループを追加
-    chown proxy:proxy /etc/squid/youtube_whitelist.txt
+    chown creater:creater /etc/squid/youtube_whitelist.txt
     chmod 664 /etc/squid/youtube_whitelist.txt
     
     # createrユーザーをsquidグループに追加してファイルアクセス権を付与
