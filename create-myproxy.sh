@@ -326,6 +326,7 @@ setup_firewall() {
     ufw allow 22/tcp || log_warn "SSH許可ルールの追加に失敗しました。"
     ufw allow 80/tcp || log_warn "HTTP許可ルールの追加に失敗しました。"
     ufw allow 443/tcp || log_warn "HTTPS許可ルールの追加に失敗しました。"
+    ufw allow 3000/tcp || log_warn "3000ポート許可ルールの追加に失敗しました。"
     ufw allow 3128/tcp || log_warn "Squidプロキシ許可ルールの追加に失敗しました。"
     
     # 自動でyesと応答
